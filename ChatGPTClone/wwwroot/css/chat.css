@@ -38,7 +38,7 @@ body {
     background: linear-gradient(135deg, #10a37f 0%, #0e906f 100%);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 16px;
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
@@ -100,7 +100,7 @@ body {
 .sidebar-menu {
     background-color: #1f1f23;
     border: 1px solid #333339;
-    border-radius: 10px;
+    border-radius: 16px;
     padding: 8px;
     margin-top: 8px;
     width: calc(100% - 20px);
@@ -120,7 +120,7 @@ body {
     border: none;
     background: transparent;
     color: #e3e3e8;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
     transition: background-color 0.2s ease;
     font-size: 14px;
@@ -133,7 +133,7 @@ body {
 .chat-item {
     padding: 14px 20px;
     cursor: pointer;
-    border-radius: 12px;
+    border-radius: 16px;
     margin: 6px 12px;
     transition: all 0.2s ease;
     font-size: 14px;
@@ -207,7 +207,7 @@ body {
 #provider-select {
     padding: 10px 14px;
     border: 1px solid #565869;
-    border-radius: 8px;
+    border-radius: 12px;
     background-color: #40414f;
     color: white;
     font-size: 14px;
@@ -228,7 +228,7 @@ body {
     padding: 10px 16px;
     background-color: #40414f;
     border: 1px solid #565869;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
     font-size: 14px;
     color: white;
@@ -317,7 +317,7 @@ body {
     padding: 10px 16px;
     background-color: #40414f;
     border: 1px solid #565869;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
     font-size: 13px;
     color: #c5c5d2;
@@ -345,7 +345,7 @@ body {
     padding: 14px;
     background-color: #40414f;
     border: 1px solid #565869;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
     font-size: 18px;
     transition: all 0.2s ease;
@@ -418,7 +418,7 @@ body {
 #error-message {
     background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
     border: 1px solid #ef4444;
-    border-radius: 8px;
+    border-radius: 16px;
     color: white;
     margin: 16px 32px;
     padding: 16px;

@@ -1,6 +1,6 @@
-# ChatGPT Clone 🤖
+# AI Chat Hub 🤖
 
-A modern, fully-featured ChatGPT-like web application built with ASP.NET Core and integrated with multiple LLM providers.
+A modern, fully-featured AI chat web application built with ASP.NET Core and integrated with multiple LLM providers.
 
 [English](#english) | [العربية](#arabic)
 
@@ -10,7 +10,7 @@ A modern, fully-featured ChatGPT-like web application built with ASP.NET Core an
 
 ### 📋 Overview
 
-ChatGPT Clone is a sophisticated chat application that allows users to interact with multiple AI providers (OpenAI, Groq, Hugging Face) through a beautiful, modern interface. Features include multiple chat management, persistent storage, and a responsive design.
+AI Chat Hub is a sophisticated chat application that allows users to interact with multiple AI providers (OpenAI, Groq, Hugging Face) through a beautiful, modern interface. Features include multiple chat management, persistent storage, and a responsive design.
 
 ### ✨ Key Features
 
@@ -67,7 +67,7 @@ ChatGPT Clone is a sophisticated chat application that allows users to interact 
 ### 🏗️ Project Structure
 
 ```
-ChatGPTClone/
+AIChat/
 ├── Controllers/
 │   └── HomeController.cs          # Request handling and business logic
 ├── Models/
@@ -108,7 +108,7 @@ cd Day2
 ```
 
 2. **Configure API Keys**
-Create `ChatGPTClone/apiconfig.json`:
+Create `AIChat/apiconfig.json`:
 ```json
 {
   "openai": {
@@ -129,7 +129,7 @@ Create `ChatGPTClone/apiconfig.json`:
 
 3. **Restore Dependencies**
 ```bash
-cd ChatGPTClone
+cd AIChat
 dotnet restore
 ```
 
