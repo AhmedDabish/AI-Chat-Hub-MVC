@@ -1,0 +1,364 @@
+﻿@model ChatGPTClone.Models.ChatViewModel
+
+@{
+    ViewData["Title"] = "ChatGPT Clone";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/chat.css" />
+</head>
+<body>
+    <div id="app">
+        <!-- Sidebar -->
+        <div id="sidebar">
+            <div id="sidebar-header">
+                <button id="new-chat-btn" class="btn-primary">New Chat</button>
+            </div>
+            <div id="recents-section">
+                <div id="recents-header">
+                    <span class="section-title">Recents</span>
+                    <button id="menu-btn" class="icon-btn" title="More options">⋮</button>
+                </div>
+                <div id="sidebar-menu" class="sidebar-menu hidden">
+                    <button id="clear-history-btn" class="menu-item">Clear History</button>
+                </div>
+            </div>
+            <div id="chat-list">
+                <!-- Chat tabs will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div id="main">
+            <div id="header">
+                <div>
+                    <h1>ChatGPT Clone</h1>
+                    <p class="chat-title">@Model.ChatTitle</p>
+                </div>
+                <div id="controls">
+                    <label for="provider-select">Provider:</label>
+                    <select id="provider-select">
+                        <option value="openai">OpenAI (gpt-4o-mini)</option>
+                        <option value="groq">Groq (llama-3.3-70b-versatile)</option>
+                        <option value="huggingface">Hugging Face (Phi-3-mini)</option>
+                    </select>
+                </div>
+            </div>
+            <div id="messages">
+                @foreach (var msg in Model.Messages)
+                {
+                    <div class="message @msg.Role">
+                        <strong>@msg.Role:</strong>
+                        <span>@Html.Raw(msg.Content?.Replace("\n", "<br>") ?? "")</span>
+                    </div>
+                }
+            </div>
+            <div id="message-actions">
+                <button id="delete-btn" class="btn-action" title="Delete last message pair">Delete</button>
+                <button id="edit-btn" class="btn-action" title="Edit last message">Edit</button>
+                <button id="regenerate-btn" class="btn-action" title="Regenerate response">Regenerate</button>
+            </div>
+            <div id="input-area">
+                <input type="file" id="file-input" style="display: none;" />
+                <button id="attach-btn" class="btn-secondary" title="Attach file">📎</button>
+                <input type="text" id="message-input" placeholder="Type your message..." />
+                <button id="send-button">
+                    <span id="send-text">Send</span>
+                    <span id="loading-spinner" style="display: none;">⏳</span>
+                </button>
+            </div>
+            <div id="error-message" style="display:none; color: red; padding: 10px; margin-top: 10px;"></div>
+        </div>
+    </div>
+
+<script>
+    let isLoading = false;
+    let currentChatId = '@Model.CurrentChatId';
+
+    // Focus on input when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        loadChats();
+        // Focus on message input after a short delay
+        setTimeout(() => {
+            document.getElementById('message-input').focus();
+        }, 100);
+    });
+
+    document.getElementById('send-button').addEventListener('click', sendMessage);
+    document.getElementById('message-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !isLoading) {
+            sendMessage();
+        }
+    });
+
+    document.getElementById('delete-btn').addEventListener('click', deleteLastMessage);
+    document.getElementById('edit-btn').addEventListener('click', editLastMessage);
+    document.getElementById('regenerate-btn').addEventListener('click', regenerateResponse);
+    document.getElementById('new-chat-btn').addEventListener('click', newChat);
+    document.getElementById('attach-btn').addEventListener('click', () => {
+        document.getElementById('file-input').click();
+    });
+    document.getElementById('menu-btn').addEventListener('click', toggleSidebarMenu);
+    document.getElementById('clear-history-btn').addEventListener('click', clearHistory);
+    document.addEventListener('click', handleGlobalClick);
+
+    function clearErrorMessage() {
+        document.getElementById('error-message').style.display = 'none';
+        document.getElementById('error-message').textContent = '';
+    }
+
+    function showErrorMessage(msg) {
+        document.getElementById('error-message').textContent = msg;
+        document.getElementById('error-message').style.display = 'block';
+    }
+
+    async function loadChats() {
+        try {
+            const response = await fetch('/Home/GetChats');
+            const chats = await response.json();
+            const chatList = document.getElementById('chat-list');
+            chatList.innerHTML = '';
+
+            if (!chats || chats.length === 0) {
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-chat-list';
+                emptyState.textContent = 'No recent chats yet';
+                chatList.appendChild(emptyState);
+                return;
+            }
+
+            chats.forEach(chat => {
+                const chatItem = document.createElement('div');
+                chatItem.className = 'chat-item';
+                chatItem.textContent = chat.title;
+                chatItem.dataset.chatId = chat.id;
+                if (chat.id === currentChatId) {
+                    chatItem.classList.add('active');
+                }
+                chatItem.addEventListener('click', () => switchChat(chat.id));
+                chatList.appendChild(chatItem);
+            });
+        } catch (error) {
+            console.error('Error loading chats:', error);
+        }
+    }
+
+    function toggleSidebarMenu(event) {
+        event.stopPropagation();
+        const menu = document.getElementById('sidebar-menu');
+        menu.classList.toggle('hidden');
+    }
+
+    function handleGlobalClick(event) {
+        const menu = document.getElementById('sidebar-menu');
+        const menuBtn = document.getElementById('menu-btn');
+        if (!menu.contains(event.target) && event.target !== menuBtn) {
+            menu.classList.add('hidden');
+        }
+    }
+
+    async function newChat() {
+        try {
+            const response = await fetch('/Home/NewChat', { method: 'POST' });
+            const data = await response.json();
+            if (data.success) {
+                currentChatId = data.chatId;
+                // Reload to show empty chat
+                location.reload();
+            }
+        } catch (error) {
+            showErrorMessage('Error creating new chat: ' + error.message);
+        }
+    }
+
+    async function switchChat(chatId) {
+        try {
+            const response = await fetch('/Home/SwitchChat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `chatId=${encodeURIComponent(chatId)}`
+            });
+            const data = await response.json();
+            if (data.success) {
+                currentChatId = chatId;
+                // Reload to show messages for the selected chat
+                location.reload();
+            }
+        } catch (error) {
+            showErrorMessage('Error switching chat: ' + error.message);
+        }
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('message-input');
+        const fileInput = document.getElementById('file-input');
+        const message = input.value.trim();
+        const file = fileInput.files[0];
+
+        if (!message && !file || isLoading) return;
+
+        isLoading = true;
+        document.getElementById('send-button').disabled = true;
+        document.getElementById('send-text').style.display = 'none';
+        document.getElementById('loading-spinner').style.display = 'inline';
+        clearErrorMessage();
+        input.value = '';
+
+        const messagesDiv = document.getElementById('messages');
+        let displayMessage = message;
+        if (file) {
+            displayMessage += ` [File: ${file.name}]`;
+        }
+        messagesDiv.innerHTML += `<div class="message user"><strong>user:</strong> <span>${displayMessage.replace(/\n/g, '<br>')}</span></div>`;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        try {
+            const provider = document.getElementById('provider-select').value;
+            const formData = new FormData();
+            formData.append('message', message);
+            formData.append('provider', provider);
+            if (file) {
+                formData.append('file', file);
+            }
+
+            const response = await fetch('/Home/SendMessage', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                messagesDiv.removeChild(messagesDiv.lastChild);
+                showErrorMessage('Error: ' + (data.error || 'Unknown error'));
+            } else {
+                messagesDiv.innerHTML += `<div class="message assistant"><strong>assistant:</strong> <span>${data.response.replace(/\n/g, '<br>')}</span></div>`;
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+        } catch (error) {
+            messagesDiv.removeChild(messagesDiv.lastChild);
+            showErrorMessage('Error: ' + error.message);
+        } finally {
+            isLoading = false;
+            document.getElementById('send-button').disabled = false;
+            document.getElementById('send-text').style.display = 'inline';
+            document.getElementById('loading-spinner').style.display = 'none';
+            input.disabled = false;
+            input.focus();
+            fileInput.value = ''; // Clear file input
+        }
+    }
+
+    async function clearHistory() {
+        if (!confirm('Are you sure you want to clear all chat history?')) return;
+
+        try {
+            const response = await fetch('/Home/ClearHistory', { method: 'POST' });
+            const data = await response.json();
+            if (data.success) {
+                document.getElementById('messages').innerHTML = '';
+                clearErrorMessage();
+            }
+        } catch (error) {
+            showErrorMessage('Error clearing history: ' + error.message);
+        }
+    }
+
+    async function deleteLastMessage() {
+        try {
+            const response = await fetch('/Home/DeleteLastMessage', { method: 'POST' });
+            const data = await response.json();
+            if (data.success) {
+                location.reload();
+            } else {
+                showErrorMessage(data.error);
+            }
+        } catch (error) {
+            showErrorMessage('Error: ' + error.message);
+        }
+    }
+
+    async function editLastMessage() {
+        const messagesDiv = document.getElementById('messages');
+        const messages = messagesDiv.querySelectorAll('.message.user');
+        if (messages.length === 0) {
+            showErrorMessage('No user message to edit');
+            return;
+        }
+
+        const lastUserMsg = messages[messages.length - 1].textContent.replace('user:', '').trim();
+        const newMessage = prompt('Edit your message:', lastUserMsg);
+        if (newMessage === null) return;
+
+        try {
+            const response = await fetch('/Home/EditLastMessage', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `newMessage=${encodeURIComponent(newMessage)}`
+            });
+            const data = await response.json();
+            if (data.success) {
+                location.reload();
+            } else {
+                showErrorMessage(data.error);
+            }
+        } catch (error) {
+            showErrorMessage('Error: ' + error.message);
+        }
+    }
+
+    async function regenerateResponse() {
+        const messagesDiv = document.getElementById('messages');
+        const messages = messagesDiv.querySelectorAll('.message');
+
+        if (messages.length < 2 || messages[messages.length - 1].classList.contains('user')) {
+            showErrorMessage('No assistant response to regenerate');
+            return;
+        }
+
+        // Remove last assistant message
+        messagesDiv.removeChild(messagesDiv.lastChild);
+
+        // Get last user message
+        const lastUserMsg = Array.from(messagesDiv.querySelectorAll('.message.user'))
+            .pop()?.textContent.replace('user:', '').trim();
+
+        if (!lastUserMsg) return;
+
+        isLoading = true;
+        document.getElementById('send-button').disabled = true;
+        clearErrorMessage();
+
+        try {
+            const provider = document.getElementById('provider-select').value;
+            const response = await fetch('/Home/SendMessage', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `message=${encodeURIComponent(lastUserMsg)}&provider=${encodeURIComponent(provider)}`
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                showErrorMessage('Error: ' + (data.error || 'Unknown error'));
+            } else {
+                messagesDiv.innerHTML += `<div class="message assistant"><strong>assistant:</strong> <span>${data.response.replace(/\n/g, '<br>')}</span></div>`;
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+        } catch (error) {
+            showErrorMessage('Error: ' + error.message);
+        } finally {
+            isLoading = false;
+            document.getElementById('send-button').disabled = false;
+            document.getElementById('send-text').style.display = 'inline';
+            document.getElementById('loading-spinner').style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>
