@@ -1,12 +1,8 @@
+<img width="1918" height="870" alt="image" src="https://github.com/user-attachments/assets/0f592e25-03da-4b46-89a8-7e113894b6e1" />
+
 # AI Chat Hub 🤖
 
 A modern, fully-featured AI chat web application built with ASP.NET Core and integrated with multiple LLM providers.
-
-[English](#english) | [العربية](#arabic)
-
----
-
-## English
 
 ### 📋 Overview
 
@@ -165,27 +161,7 @@ Open your browser and navigate to `http://localhost:5292`
 - **Regenerate Response** - Get a new AI response to the same prompt
 - **Attach Files** - Click the 📎 button to attach files
 - **Change Provider** - Select different AI providers from the dropdown
-
-### 🔧 Configuration
-
-#### Application Settings
-`appsettings.json` - General app configuration
-```json
-{
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information"
-    }
-  }
-}
-```
-
-#### Launch Settings
-`Properties/launchSettings.json` - Development server configuration
-- Default port: `5292`
-- HTTPS port: `7107`
-- Auto-launch browser on startup
-
+  
 ### 💾 Data Storage
 
 All chats are automatically saved to `chats.json` with the following structure:
@@ -209,48 +185,6 @@ All chats are automatically saved to `chats.json` with the following structure:
 ]
 ```
 
-### 🎨 Design & UX
-
-- **Dark Theme** - Professional dark interface for extended use
-- **Gradient Buttons** - Modern visual feedback with smooth animations
-- **Responsive Layout** - Sidebar navigation with main chat area
-- **Loading Indicators** - Visual feedback during API calls
-- **Smooth Animations** - Message fadeIn effects and hover states
-- **Message Bubbles** - Color-coded messages (green for user, gray for AI)
-
-### 🔐 Security
-
-- ⚠️ **API Keys** - Never commit `apiconfig.json` to version control (added to `.gitignore`)
-- 🔒 **Input Validation** - All user inputs are sanitized
-- 🛡️ **Error Handling** - Comprehensive error messages and logging
-
-### 📦 Dependencies
-
-#### NuGet Packages
-```xml
-<ItemGroup>
-    <PackageReference Include="OpenAI" Version="latest" />
-    <PackageReference Include="Microsoft.AspNetCore.App" Version="latest" />
-</ItemGroup>
-```
-
-### 🐛 Troubleshooting
-
-| Issue | Solution |
-|-------|----------|
-| API keys not found | Ensure `apiconfig.json` exists with valid credentials |
-| Port already in use | Change port in `launchSettings.json` |
-| Build fails | Run `dotnet clean && dotnet restore && dotnet build` |
-| Chats not saving | Check file system permissions for `chats.json` creation |
-| No response from AI | Verify API key is valid and quota not exceeded |
-
-### 📝 Notes
-
-- Chat history persists across browser sessions
-- Chat titles are auto-generated from the first 35 characters of your initial message
-- Multiple AI providers can be tested by changing the provider dropdown
-- All API responses are streamed in real-time
-
 ### 🚧 Future Enhancements
 
 - [ ] User authentication and cloud sync
@@ -262,13 +196,5 @@ All chats are automatically saved to `chats.json` with the following structure:
 - [ ] Dark/Light theme toggle
 - [ ] API usage analytics
 
-### 📄 License
-
-This project is open source and available under the MIT License.
-
-### 👨‍💻 Contributing
-
-Contributions are welcome! Please feel free to submit pull requests or open issues.
 
 
-**Made with ❤️ using ASP.NET Core, C#, and modern web technologies**
