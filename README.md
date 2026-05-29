@@ -31,6 +31,7 @@ AI Chat Hub is a sophisticated chat application that allows users to interact wi
 | **.NET CLI** | Latest | Build, run, and manage the project |
 | **MVC Pattern** | - | Application architecture and separation of concerns |
 
+
 #### Frontend
 | Technology | Version | Purpose |
 |-----------|---------|---------|
