@@ -7,7 +7,6 @@ A modern, fully-featured AI chat web application built with ASP.NET Core and int
 ### 📋 Overview
 
 AI Chat Hub is a sophisticated chat application that allows users to interact with multiple AI providers (OpenAI, Groq, Hugging Face) through a beautiful, modern interface. Features include multiple chat management, persistent storage, and a responsive design.
-
 ### ✨ Key Features
  
 - 💬 **Multi-Provider Support** - Seamlessly switch between OpenAI, Groq, and Hugging Face models
